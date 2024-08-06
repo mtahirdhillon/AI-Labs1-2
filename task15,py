@@ -1,3 +1,5 @@
+def main():
+    password = input("Enter a password: ")
     
     if len(password) < 6 or len(password) > 16:
         print("Password must be between 6 and 16 characters")
@@ -23,4 +25,7 @@
     else:
         print("Invalid password")
         
-main()
+main()    
+  
+    
+  
