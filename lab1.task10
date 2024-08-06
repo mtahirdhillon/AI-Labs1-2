@@ -1,1 +1,4 @@
+my_list = ["Tahir", 14 , 1.23]
+print(my_list)
 
+print(my_list[1])
