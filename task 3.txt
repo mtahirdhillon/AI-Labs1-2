@@ -1,0 +1,73 @@
+import heapq
+
+class PuzzleState:
+    def __init__(self, board, parent=None, move=None, cost=0):
+        self.board = board
+        self.parent = parent
+        self.move = move
+        self.cost = cost
+        self.heuristic = self.calculate_heuristic()
+        self.f = cost + self.heuristic
+
+    def __lt__(self, other):
+        return self.f < other.f
+
+    def calculate_heuristic(self):
+        goal = [1, 2, 3, 4, 5, 6, 7, 8, 0]
+        return sum(1 for i, tile in enumerate(self.board) if tile != goal[i] and tile != 0)
+
+    def get_blank_index(self):
+        return self.board.index(0)
+
+    def generate_moves(self):
+        moves = []
+        blank_index = self.get_blank_index()
+        row, col = divmod(blank_index, 3)
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        for dr, dc in directions:
+            new_row, new_col = row + dr, col + dc
+            if 0 <= new_row < 3 and 0 <= new_col < 3:
+                new_index = new_row * 3 + new_col
+                new_board = list(self.board)
+                new_board[blank_index], new_board[new_index] = new_board[new_index], new_board[blank_index]
+                moves.append((new_board, new_index))
+        return moves
+
+def a_star_search(start_board):
+    start_state = PuzzleState(start_board)
+    goal_state = PuzzleState([1, 2, 3, 4, 5, 6, 7, 8, 0])
+    
+    open_list = []
+    heapq.heappush(open_list, start_state)
+    closed_list = set()
+    closed_list.add(tuple(start_state.board))
+    
+    while open_list:
+        current_state = heapq.heappop(open_list)
+        
+        if current_state.board == goal_state.board:
+            path = []
+            while current_state:
+                path.append(current_state.board)
+                current_state = current_state.parent
+            return path[::-1]
+        
+        for neighbor_board, _ in current_state.generate_moves():
+            neighbor_state = PuzzleState(neighbor_board, current_state, cost=current_state.cost + 1)
+            if tuple(neighbor_state.board) in closed_list:
+                continue
+            closed_list.add(tuple(neighbor_state.board))
+            heapq.heappush(open_list, neighbor_state)
+    
+    return None  # No path found
+
+# Example usage
+start_board = [1, 2, 3, 4, 5, 6, 7, 0, 8]  # Example starting configuration
+path = a_star_search(start_board)
+
+if path:
+    print("Solution path:")
+    for step in path:
+        print(step)
+else:
+    print("No solution found.")
