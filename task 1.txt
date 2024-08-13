@@ -1,0 +1,59 @@
+import heapq
+
+class Node:
+    def __init__(self, state, parent=None):
+        self.state = state
+        self.parent = parent
+
+    def __lt__(self, other):
+        return self.heuristic() < other.heuristic()
+
+    def heuristic(self):
+        return heuristic(self.state)
+
+def greedy_best_first_search(start, goal):
+    open_list = []
+    heapq.heappush(open_list, Node(start))
+    visited = set()
+
+    while open_list:
+        current_node = heapq.heappop(open_list)
+
+        if current_node.state == goal:
+            return reconstruct_path(current_node)
+
+        if current_node.state in visited:
+            continue
+
+        visited.add(current_node.state)
+
+        for neighbor in get_neighbors(current_node.state):
+            if neighbor not in visited:
+                heapq.heappush(open_list, Node(neighbor, current_node))
+
+    return None
+
+def get_neighbors(state):
+    # Replace this with your problem-specific neighbor logic
+    return []
+
+def heuristic(state):
+    # Replace this with your problem-specific heuristic function
+    return 0
+
+def reconstruct_path(node):
+    path = []
+    while node:
+        path.append(node.state)
+        node = node.parent
+    return path[::-1]
+
+# Example usage:
+if __name__ == "__main__":
+    start_state = 'A'
+    goal_state = 'Z'
+    path = greedy_best_first_search(start_state, goal_state)
+    if path:
+        print("Path found:", path)
+    else:
+        print("No path found")
